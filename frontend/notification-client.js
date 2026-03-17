@@ -8,9 +8,7 @@ let currentDoctorId = null;
 function connectToNotificationServer(doctorId, doctorEmail) {
   return new Promise((resolve) => {
     try {
-      const wsUrl = window.location.hostname === 'localhost' 
-        ? 'ws://localhost:3000'
-        : `wss://${window.location.hostname}:3000`;
+      const wsUrl = "wss://healify-websocket-server.onrender.com";
       
       doctorWs = new WebSocket(wsUrl);
 

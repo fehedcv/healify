@@ -16,10 +16,7 @@ function connectNotificationServer() {
   return new Promise((resolve) => {
     try {
       // Try to connect to WebSocket server
-      const wsUrl = window.location.hostname === 'localhost' 
-        ? 'ws://localhost:3000'
-        : `ws://${window.location.hostname}:3000`;
-      
+      const wsUrl = "wss://healify-websocket-server.onrender.com";
       notificationWs = new WebSocket(wsUrl);
 
       notificationWs.onopen = () => {
