@@ -22,8 +22,9 @@ if (registerBtn) {
       const result = await createUserWithEmailAndPassword(auth, email, password);
       const uid = result.user.uid;
       
-      // Store patient ID and name in localStorage
+      // Store patient ID, name, and email in localStorage
       localStorage.setItem('patientId', uid);
+      localStorage.setItem('patientEmail', email);
       if (nameInput?.value) {
         localStorage.setItem('patientName', nameInput.value);
       }
@@ -56,8 +57,9 @@ if (loginBtn) {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const uid = result.user.uid;
       
-      // Store patient ID in localStorage
+      // Store patient ID and email in localStorage
       localStorage.setItem('patientId', uid);
+      localStorage.setItem('patientEmail', email);
       
       alert("Patient login successful ✅");
       window.location.href = "patient-dashboard.html";

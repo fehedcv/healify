@@ -5,89 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video Consultation - Healify</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://meet.jit.si/external_api.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
         .consultation-container {
             display: flex;
             height: 100vh;
-            background: #000;
-        }
-
-        .video-container {
-            flex: 1;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 10px;
-            padding: 10px;
-        }
-
-        .video-item {
-            background: #222;
-            border-radius: 10px;
+            background: #fff;
             overflow: hidden;
-            position: relative;
         }
 
-        video {
+        #jitsiConference {
+            flex: 1;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-        }
-
-        .video-label {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.9rem;
-        }
-
-        .controls {
-            position: absolute;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 10px;
-            background: rgba(0,0,0,0.7);
-            padding: 10px;
-            border-radius: 50px;
-            z-index: 10;
-        }
-
-        .control-btn {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: none;
-            background: #667eea;
-            color: white;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: background 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .control-btn:hover:not(:disabled) {
-            background: #5568d3;
-        }
-
-        .control-btn:disabled {
-            background: #d9534f;
-            cursor: not-allowed;
-            opacity: 0.5;
-        }
-
-        .control-btn.active {
-            background: #5cb85c;
-        }
-
-        .control-btn.active:hover {
-            background: #4cae52;
+            min-height: 600px;
+            position: relative;
         }
 
         .sidebar {
@@ -108,63 +52,6 @@
             color: #333;
         }
 
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .message {
-            padding: 0.8rem;
-            border-radius: 5px;
-            max-width: 90%;
-            word-wrap: break-word;
-        }
-
-        .message.sent {
-            background: #667eea;
-            color: white;
-            align-self: flex-end;
-        }
-
-        .message.received {
-            background: #f0f0f0;
-            color: #333;
-            align-self: flex-start;
-        }
-
-        .message-input {
-            padding: 1rem;
-            border-top: 1px solid #ddd;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .message-input input {
-            flex: 1;
-            padding: 0.7rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.9rem;
-        }
-
-        .message-input button {
-            padding: 0.7rem 1rem;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .message-input button:hover {
-            background: #5568d3;
-        }
-
         .consultation-info {
             padding: 1rem;
             background: #f9f9f9;
@@ -177,6 +64,23 @@
             color: #666;
         }
 
+        .back-button {
+            padding: 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: background 0.3s;
+            width: calc(100% - 2rem);
+            margin: 1rem;
+        }
+
+        .back-button:hover {
+            background: #5568d3;
+        }
+
         @media (max-width: 768px) {
             .consultation-container {
                 flex-direction: column;
@@ -184,59 +88,36 @@
 
             .sidebar {
                 width: 100%;
-                height: 250px;
+                height: auto;
                 border-left: none;
                 border-top: 1px solid #ddd;
+                max-height: 250px;
             }
         }
     </style>
 </head>
 <body>
     <div class="consultation-container">
-        <!-- Video Area -->
-        <div class="video-container">
-            <div class="video-item">
-                <video id="localVideo" autoplay muted playsinline></video>
-                <div class="video-label">You (Local)</div>
-            </div>
-            <div class="video-item">
-                <video id="remoteVideo" autoplay playsinline></video>
-                <div class="video-label" id="remoteLabel">Doctor (Remote)</div>
-            </div>
+        <!-- Jitsi Conference Area -->
+        <div id="jitsiConference"></div>
 
-            <!-- Controls -->
-            <div class="controls">
-                <button class="control-btn" id="startCallBtn" title="Start Call">▶️</button>
-                <button class="control-btn" id="joinCallBtn" title="Join Call">🟢</button>
-                <button class="control-btn active" id="micBtn" title="Toggle Mic">🎤</button>
-                <button class="control-btn active" id="cameraBtn" title="Toggle Camera">📹</button>
-                <button class="control-btn" id="screenBtn" title="Share Screen">🖥️</button>
-                <button class="control-btn" id="endCallBtn" title="End Call" disabled>📞</button>
-            </div>
-        </div>
-
-        <!-- Sidebar - Chat -->
+        <!-- Sidebar - Info -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <h3>Chat</h3>
+                <h3>Consultation Info</h3>
             </div>
 
             <div class="consultation-info">
-                <div class="info-item"><strong>Duration:</strong> <span id="duration">00:00</span></div>
-                <div class="info-item"><strong>Call ID:</strong> <span id="callId">-</span></div>
-                <div class="info-item"><strong>Status:</strong> <span id="status">Idle</span></div>
+                <div class="info-item"><strong>Room ID:</strong> <span id="roomId">Loading...</span></div>
+                <div class="info-item"><strong>Status:</strong> <span id="status">Connecting...</span></div>
+                <div class="info-item"><strong>Participants:</strong> <span id="participantCount">1</span></div>
             </div>
 
-            <div class="chat-box" id="chatBox"></div>
-
-            <div class="message-input">
-                <input type="text" id="messageInput" placeholder="Type a message...">
-                <button id="sendMessageBtn">Send</button>
-            </div>
+            <button class="back-button" id="endCallBtn" onclick="goBack()">End Consultation</button>
         </div>
     </div>
 
     <script type="module" src="./firebase-config.js"></script>
-    <script type="module" src="./webrtc/video-call.js"></script>
+    <script type="module" src="./jitsi-video-call.js"></script>
 </body>
 </html>

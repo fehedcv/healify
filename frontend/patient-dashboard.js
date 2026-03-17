@@ -49,7 +49,7 @@ async function loadDoctors() {
             <h3 class="doctor-name">${d.name || 'Unknown'}</h3>
             <p class="doctor-specialty">${d.specialization || ''}</p>
             <div class="doctor-footer">
-              <button class="btn-consult btn-call" data-id="${id}" data-name="${encodeURIComponent(d.name || '')}">Call</button>
+              <button class="btn-consult btn-call" data-id="${id}" data-email="${d.email || ''}" data-name="${encodeURIComponent(d.name || '')}">Call</button>
               <a class="btn-profile" href="doctor-profile.html?id=${encodeURIComponent(id)}">Profile</a>
             </div>
           </div>
@@ -70,9 +70,11 @@ async function loadDoctors() {
     const btn = e.target.closest('.btn-call');
     if (!btn) return;
     const doctorId = btn.dataset.id;
+    const doctorEmail = btn.dataset.email || '';
     const doctorName = decodeURIComponent(btn.dataset.name || 'Doctor');
-    // navigate to video consultation with doctor info
-    window.location.href = `video-consultation.html?doctorId=${encodeURIComponent(doctorId)}&doctorName=${encodeURIComponent(doctorName)}`;
+    // navigate to video consultation with doctor info (use email if available, fallback to doctorId)
+    const identifier = doctorEmail ? `doctorEmail=${encodeURIComponent(doctorEmail)}` : `doctorId=${encodeURIComponent(doctorId)}`;
+    window.location.href = `video-consultation.html?${identifier}&doctorName=${encodeURIComponent(doctorName)}`;
   });
 }
 
