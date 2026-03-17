@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Doctor Profile</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .success-text { color: green; }
+    .error-text { color: red; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>My Profile</h2>
+
+  <img id="photo" width="150"><br><br>
+  <!-- upload new profile photo -->
+  <div class="form-group">
+    <label for="photoInput">Change photo:</label><br>
+    <input type="file" id="photoInput" accept="image/*">
+  </div>
+  <button id="saveBtn" class="btn btn-primary btn-full">Save</button>
+  <p id="updateMsg" class="success-text"></p>
+  <p id="nameMsg" class="error-text"></p>
+  <p><b>Name:</b> <span id="name"></span></p>
+  <p><b>Specialization:</b> <span id="spec"></span></p>
+  <p><b>Email:</b> <span id="email"></span></p>
+</div>
+
+<script type="module" src="./doctor-profile.js"></script>
+
+</body>
+</html>

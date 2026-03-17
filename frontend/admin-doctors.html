@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Management - Healify Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .admin-header h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 0.8rem 1.5rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .form-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-section h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .image-preview {
+            margin-top: 1rem;
+        }
+
+        .image-preview img {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #ecf0f1;
+            color: #333;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #d5dbdb;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .doctors-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .doctor-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
+
+        .doctor-info {
+            padding: 1.5rem;
+        }
+
+        .doctor-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+
+        .doctor-info p {
+            margin: 0.3rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .doctor-info .specialization {
+            color: #667eea;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .doctor-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .doctor-actions button {
+            flex: 1;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: #3498db;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #2980b9;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .doctors-list {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>🏥 Doctor Management</h1>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Add/Edit Doctor Form -->
+        <div class="form-section">
+            <h2 id="formTitle">Add New Doctor</h2>
+
+            <form id="doctorForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="doctorName">Full Name *</label>
+                        <input type="text" id="doctorName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorEmail">Email Address *</label>
+                        <input type="email" id="doctorEmail" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorPassword">Password *</label>
+                        <input type="password" id="doctorPassword" required placeholder="Temporary password">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorPhone">Phone Number *</label>
+                        <input type="tel" id="doctorPhone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorSpecialization">Specialization *</label>
+                        <input type="text" id="doctorSpecialization" placeholder="e.g., Cardiology, Dermatology" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorExperience">Years of Experience *</label>
+                        <input type="number" id="doctorExperience" min="0" placeholder="5" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="doctorFee">Consultation Fee ($) *</label>
+                        <input type="number" id="doctorFee" min="0" step="0.01" placeholder="50" required>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="doctorQualifications">Qualifications *</label>
+                        <textarea id="doctorQualifications" placeholder="e.g., MD from Harvard, Specialization in Cardiology" required></textarea>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="doctorBio">Bio</label>
+                        <textarea id="doctorBio" placeholder="Brief bio about the doctor"></textarea>
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="doctorImage">Profile Picture *</label>
+                        <input type="file" id="doctorImage" accept="image/*" required>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        <span class="spinner-icon">
+                            <div class="loading-spinner"></div>
+                        </span>
+                        <span class="btn-text">Add Doctor</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="resetBtn" onclick="resetForm()">Clear Form</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Doctors List -->
+        <div class="form-section">
+            <h2>Doctors Directory</h2>
+            <div id="doctorsList" class="doctors-list">
+                <p style="grid-column: 1/-1; text-align: center; color: #999;">Loading doctors...</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Doctor</h2>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editDoctorForm">
+                <div class="form-group">
+                    <label for="editDoctorName">Full Name</label>
+                    <input type="text" id="editDoctorName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorPhone">Phone Number</label>
+                    <input type="tel" id="editDoctorPhone" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorSpecialization">Specialization</label>
+                    <input type="text" id="editDoctorSpecialization" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorExperience">Years of Experience</label>
+                    <input type="number" id="editDoctorExperience" min="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorFee">Consultation Fee ($)</label>
+                    <input type="number" id="editDoctorFee" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorQualifications">Qualifications</label>
+                    <textarea id="editDoctorQualifications" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorBio">Bio</label>
+                    <textarea id="editDoctorBio"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editDoctorImage">Profile Picture (Leave empty to keep current)</label>
+                    <input type="file" id="editDoctorImage" accept="image/*">
+                    <div class="image-preview" id="editImagePreview"></div>
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="updateBtn">Update Doctor</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
+
+    <script>
+        let currentEditingDoctorId = null;
+
+        // Wait for firebaseService to be ready
+        async function waitForFirebaseService() {
+            let attempts = 0;
+            while (attempts < 50) {
+                if (typeof firebaseService !== 'undefined' && firebaseService.auth) {
+                    return true;
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            throw new Error('Firebase Service failed to initialize');
+        }
+
+        // Image preview
+        document.getElementById('doctorImage').addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('imagePreview').innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        document.getElementById('editDoctorImage').addEventListener('change', (e) => {
+            if (e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    document.getElementById('editImagePreview').innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        // Submit form
+        document.getElementById('doctorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addOrUpdateDoctor();
+        });
+
+        async function addOrUpdateDoctor() {
+            const name = document.getElementById('doctorName').value;
+            const email = document.getElementById('doctorEmail').value;
+            const password = document.getElementById('doctorPassword').value;
+            const phone = document.getElementById('doctorPhone').value;
+            const specialization = document.getElementById('doctorSpecialization').value;
+            const experience = parseInt(document.getElementById('doctorExperience').value);
+            const fee = parseFloat(document.getElementById('doctorFee').value);
+            const qualifications = document.getElementById('doctorQualifications').value;
+            const bio = document.getElementById('doctorBio').value;
+            const imageFile = document.getElementById('doctorImage').files[0];
+
+            // Validation
+            if (!name || !email || !phone || !specialization) {
+                showMessage('Please fill in all required fields', 'error');
+                return;
+            }
+            if (!password || password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.querySelector('.loading-spinner').style.display = 'inline-block';
+
+            try {
+                // Ensure Firebase is ready
+                if (!firebaseService || !firebaseService.auth) {
+                    await waitForFirebaseService();
+                }
+
+                // pass password for new account registration
+                const result = await firebaseService.addDoctor({
+                    name,
+                    email,
+                    phoneNumber: phone,
+                    specialization,
+                    experience,
+                    consultationFee: fee,
+                    qualifications,
+                    bio
+                }, imageFile, password);
+
+                if (result.success) {
+                    showMessage('✓ Doctor added successfully!', 'success');
+                    resetForm();
+                    await loadDoctors();
+                } else {
+                    showMessage('❌ ' + (result.error || 'Failed to add doctor'), 'error');
+                }
+            } catch (error) {
+                console.error('Error adding doctor:', error);
+                showMessage('❌ ' + (error.message || 'An error occurred'), 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.querySelector('.loading-spinner').style.display = 'none';
+            }
+        }
+
+        async function loadDoctors() {
+            try {
+                if (!firebaseService || !firebaseService.auth) {
+                    await waitForFirebaseService();
+                }
+
+                const result = await firebaseService.getAllDoctors();
+                const doctorsList = document.getElementById('doctorsList');
+
+                if (result.success && result.doctors && result.doctors.length > 0) {
+                    doctorsList.innerHTML = result.doctors.map(doctor => `
+                        <div class="doctor-card">
+                            <img src="${doctor.profileImage || 'https://via.placeholder.com/300x250?text=No+Image'}" alt="${doctor.name}" class="doctor-image">
+                            <div class="doctor-info">
+                                <h3>${doctor.name}</h3>
+                                <p class="specialization">${doctor.specialization}</p>
+                                <p><strong>Experience:</strong> ${doctor.experience} years</p>
+                                <p><strong>Fee:</strong> $${doctor.consultationFee}</p>
+                                <p><strong>Rating:</strong> ${doctor.rating ? (doctor.rating.toFixed(1)) : 'No ratings yet'}</p>
+                                <p>${doctor.phoneNumber}</p>
+                                <div class="doctor-actions">
+                                    <button class="edit-btn" onclick="editDoctor('${doctor.id}')">Edit</button>
+                                    <button class="delete-btn" onclick="deleteDoctor('${doctor.id}')">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    doctorsList.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No doctors found. Add the first doctor above.</p>';
+                }
+            } catch (error) {
+                console.error('Error loading doctors:', error);
+                showMessage('❌ Failed to load doctors', 'error');
+            }
+        }
+
+        async function editDoctor(doctorId) {
+            try {
+                if (!firebaseService || !firebaseService.auth) {
+                    await waitForFirebaseService();
+                }
+
+                const result = await firebaseService.getDoctorById(doctorId);
+                if (result.success) {
+                    const doctor = result.doctor;
+                    currentEditingDoctorId = doctorId;
+
+                    document.getElementById('editDoctorName').value = doctor.name;
+                    document.getElementById('editDoctorPhone').value = doctor.phoneNumber;
+                    document.getElementById('editDoctorSpecialization').value = doctor.specialization;
+                    document.getElementById('editDoctorExperience').value = doctor.experience;
+                    document.getElementById('editDoctorFee').value = doctor.consultationFee;
+                    document.getElementById('editDoctorQualifications').value = doctor.qualifications;
+                    document.getElementById('editDoctorBio').value = doctor.bio;
+
+                    if (doctor.profileImage) {
+                        document.getElementById('editImagePreview').innerHTML = `<img src="${doctor.profileImage}" alt="Preview">`;
+                    }
+
+                    document.getElementById('editModal').classList.add('show');
+                } else {
+                    showMessage('❌ ' + (result.error || 'Failed to load doctor'), 'error');
+                }
+            } catch (error) {
+                console.error('Error editing doctor:', error);
+                showMessage('❌ ' + (error.message || 'An error occurred'), 'error');
+            }
+        }
+
+        document.getElementById('editDoctorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await updateDoctor();
+        });
+
+        async function updateDoctor() {
+            const name = document.getElementById('editDoctorName').value;
+            const phone = document.getElementById('editDoctorPhone').value;
+            const specialization = document.getElementById('editDoctorSpecialization').value;
+            const experience = parseInt(document.getElementById('editDoctorExperience').value);
+            const fee = parseFloat(document.getElementById('editDoctorFee').value);
+            const qualifications = document.getElementById('editDoctorQualifications').value;
+            const bio = document.getElementById('editDoctorBio').value;
+            const imageFile = document.getElementById('editDoctorImage').files[0];
+
+            const updateBtn = document.getElementById('updateBtn');
+            updateBtn.disabled = true;
+
+            try {
+                if (!firebaseService || !firebaseService.auth) {
+                    await waitForFirebaseService();
+                }
+
+                let updateData = {
+                    name,
+                    phoneNumber: phone,
+                    specialization,
+                    experience,
+                    consultationFee: fee,
+                    qualifications,
+                    bio
+                };
+
+                if (imageFile) {
+                    const uploadResult = await firebaseService.uploadFile(imageFile, 'doctors');
+                    if (uploadResult.success) {
+                        updateData.profileImage = uploadResult.url;
+                    } else {
+                        showMessage('⚠️ Image upload failed, updating without image', 'warning');
+                    }
+                }
+
+                const result = await firebaseService.updateDoctor(currentEditingDoctorId, updateData);
+                if (result.success) {
+                    showMessage('✓ Doctor updated successfully!', 'success');
+                    closeEditModal();
+                    await loadDoctors();
+                } else {
+                    showMessage('❌ ' + (result.error || 'Failed to update doctor'), 'error');
+                }
+            } catch (error) {
+                console.error('Error updating doctor:', error);
+                showMessage('❌ ' + (error.message || 'An error occurred'), 'error');
+            } finally {
+                updateBtn.disabled = false;
+            }
+        }
+
+        async function deleteDoctor(doctorId) {
+            if (confirm('Are you sure you want to delete this doctor?')) {
+                try {
+                    if (!firebaseService || !firebaseService.auth) {
+                        await waitForFirebaseService();
+                    }
+
+                    const result = await firebaseService.deleteDoctor(doctorId);
+                    if (result.success) {
+                        showMessage('✓ Doctor deleted successfully!', 'success');
+                        await loadDoctors();
+                    } else {
+                        showMessage('❌ ' + (result.error || 'Failed to delete doctor'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Error deleting doctor:', error);
+                    showMessage('❌ ' + (error.message || 'An error occurred'), 'error');
+                }
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('doctorForm').reset();
+            document.getElementById('imagePreview').innerHTML = '';
+            document.getElementById('formTitle').textContent = 'Add New Doctor';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            currentEditingDoctorId = null;
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message show ${type}`;
+            setTimeout(() => messageDiv.classList.remove('show'), 4000);
+        }
+
+
+        // Load doctors and verify admin authentication on page load
+        window.addEventListener('load', async () => {
+            try {
+                if (!firebaseService || !firebaseService.auth) {
+                    await waitForFirebaseService();
+                }
+                // make sure the signed in user is an admin
+                const userData = await firebaseService.getCurrentUserData();
+                if (!userData || userData.userType !== 'admin') {
+                    // not authorized - redirect to admin login
+                    window.location.href = 'admin-login.html';
+                    return;
+                }
+                // optionally store adminId for later use
+                localStorage.setItem('adminId', firebase.auth().currentUser.uid);
+
+                await loadDoctors();
+            } catch (error) {
+                console.error('Page load error:', error);
+                showMessage('❌ Failed to initialize. Please refresh the page.', 'error');
+            }
+        });
+
+        // logout helper now clears localStorage as well
+        async function logout() {
+            try {
+                if (firebaseService) {
+                    await firebaseService.logout();
+                }
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+            localStorage.removeItem('adminId');
+            window.location.href = 'admin-login.html';
+        }
+    </script>
+</body>
+</html>

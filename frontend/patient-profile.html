@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Patient Profile</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="profile-card profile-card--large">
+    <div class="profile-grid">
+      <div class="profile-left">
+        <img id="photo" class="profile-avatar" src="https://via.placeholder.com/150" alt="Profile Picture">
+        <div class="profile-actions">
+          <button class="btn btn-primary" id="editProfile">Edit Profile</button>
+          <a href="patient-dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+        </div>
+      </div>
+      <div class="profile-right">
+        <div class="profile-header">
+          <h2 id="name">Patient Name</h2>
+          <div class="profile-meta">
+            <span class="badge">Verified</span>
+            <span class="muted">Member since 2025</span>
+          </div>
+        </div>
+
+        <div class="profile-info">
+          <div class="info-row"><span class="label">Email</span><span id="email" class="value muted"></span></div>
+          <div class="info-row"><span class="label">Age</span><span id="age" class="value">N/A</span></div>
+          <div class="info-row"><span class="label">Gender</span><span id="gender" class="value">N/A</span></div>
+        </div>
+
+        <h3 class="section-title">Medical History</h3>
+        <div class="history-card">
+          <p id="history">No medical history available. Update your profile to add details.</p>
+        </div>
+
+        <h3 class="section-title">Upcoming Appointments</h3>
+        <div id="appointments" class="appointments-list">
+          <p class="muted">No upcoming appointments</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./patient-profile.js"></script>
+
+</body>
+</html>

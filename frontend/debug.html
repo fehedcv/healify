@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Debug - Healify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .debug-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .status-list {
+            list-style: none;
+        }
+
+        .status-item {
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            border-left: 4px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        .status-item.success {
+            border-left-color: #27ae60;
+            background: #d4edda;
+        }
+
+        .status-item.error {
+            border-left-color: #e74c3c;
+            background: #f8d7da;
+        }
+
+        .status-item.warning {
+            border-left-color: #f39c12;
+            background: #fff3cd;
+        }
+
+        .status-item.info {
+            border-left-color: #3498db;
+            background: #d1ecf1;
+        }
+
+        .label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .value {
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .button-group {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-home {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-home:hover {
+            background: #5568d3;
+        }
+
+        .btn-login {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-login:hover {
+            background: #229954;
+        }
+
+        .test-section {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f0f0f0;
+            border-radius: 5px;
+        }
+
+        .test-section h3 {
+            color: #333;
+            margin-bottom: 0.8rem;
+            font-size: 1rem;
+        }
+
+        .test-input {
+            width: 100%;
+            padding: 0.6rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .test-btn {
+            width: 100%;
+            padding: 0.6rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .test-btn:hover {
+            background: #2980b9;
+        }
+
+        .test-result {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background: white;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .test-result.show {
+            display: block;
+        }
+
+        .console-output {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #1e1e1e;
+            color: #00ff00;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            max-height: 300px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        .console-log {
+            color: #00ff00;
+        }
+
+        .console-error {
+            color: #ff6b6b;
+        }
+
+        .console-warn {
+            color: #ffd700;
+        }
+
+        .console-info {
+            color: #87ceeb;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔧 Firebase Debug Console</h1>
+
+        <ul class="status-list" id="statusList"></ul>
+
+        <div class="test-section">
+            <h3>🧪 Test Firebase Connection</h3>
+            <input type="email" class="test-input" id="testEmail" placeholder="Enter test email">
+            <input type="password" class="test-input" id="testPassword" placeholder="Enter test password">
+            <button class="test-btn" onclick="testLogin()">Test Login</button>
+            <div class="test-result" id="testResult"></div>
+        </div>
+
+        <div class="console-output" id="console"></div>
+
+        <div class="button-group">
+            <button class="btn-home" onclick="window.location.href='index.html'">← Home</button>
+            <button class="btn-login" onclick="window.location.href='patient-login.html'">Patient Login →</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js"></script>
+
+    <script>
+        // Capture console logs
+        const consoleLogs = [];
+        const consoleElement = document.getElementById('console');
+        
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        const originalInfo = console.info;
+
+        function addConsoleLog(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = `console-${type}`;
+            div.textContent = `[${type.toUpperCase()}] ${message}`;
+            consoleElement.appendChild(div);
+            consoleElement.scrollTop = consoleElement.scrollHeight;
+        }
+
+        console.log = function(...args) {
+            originalLog(...args);
+            addConsoleLog(args.join(' '), 'log');
+        };
+
+        console.error = function(...args) {
+            originalError(...args);
+            addConsoleLog(args.join(' '), 'error');
+        };
+
+        console.warn = function(...args) {
+            originalWarn(...args);
+            addConsoleLog(args.join(' '), 'warn');
+        };
+
+        console.info = function(...args) {
+            originalInfo(...args);
+            addConsoleLog(args.join(' '), 'info');
+        };
+
+        // Status checks
+        function checkStatus() {
+            const statusList = document.getElementById('statusList');
+            const statuses = [];
+
+            // Check if Firebase is loaded
+            statuses.push({
+                label: 'Firebase SDK Loaded',
+                value: typeof firebase !== 'undefined',
+                type: typeof firebase !== 'undefined' ? 'success' : 'error'
+            });
+
+            // Check if Firebase Apps
+            statuses.push({
+                label: 'Firebase Apps',
+                value: firebase.apps?.length > 0 ? `${firebase.apps.length} app(s)` : 'No apps initialized',
+                type: firebase.apps?.length > 0 ? 'success' : 'error'
+            });
+
+            // Check if firebaseService exists
+            statuses.push({
+                label: 'firebaseService Instance',
+                value: typeof window.firebaseService !== 'undefined' ? 'Exists' : 'NOT DEFINED',
+                type: typeof window.firebaseService !== 'undefined' ? 'success' : 'error'
+            });
+
+            // Check Firebase config
+            if (firebase.apps?.length > 0) {
+                const app = firebase.apps[0];
+                const config = app.options;
+                statuses.push({
+                    label: 'Firebase Config - Project ID',
+                    value: config.projectId || 'NOT SET',
+                    type: config.projectId && config.projectId !== 'your-project-id' ? 'success' : 'warning'
+                });
+
+                statuses.push({
+                    label: 'Firebase Config - API Key',
+                    value: config.apiKey ? '✓ Set' : 'NOT SET',
+                    type: config.apiKey && config.apiKey !== 'YOUR_API_KEY_HERE' ? 'success' : 'error'
+                });
+
+                // Check auth
+                try {
+                    const auth = firebase.auth();
+                    statuses.push({
+                        label: 'Firebase Auth',
+                        value: 'Available',
+                        type: 'success'
+                    });
+                } catch (e) {
+                    statuses.push({
+                        label: 'Firebase Auth',
+                        value: 'Error: ' + e.message,
+                        type: 'error'
+                    });
+                }
+
+                // Check firestore
+                try {
+                    const db = firebase.firestore();
+                    statuses.push({
+                        label: 'Firestore Database',
+                        value: 'Available',
+                        type: 'success'
+                    });
+                } catch (e) {
+                    statuses.push({
+                        label: 'Firestore Database',
+                        value: 'Error: ' + e.message,
+                        type: 'error'
+                    });
+                }
+            } else {
+                statuses.push({
+                    label: 'Firebase Config',
+                    value: 'Firebase not initialized - Check firebase-config.js',
+                    type: 'error'
+                });
+            }
+
+            // Render statuses
+            statusList.innerHTML = statuses.map(status => `
+                <li class="status-item ${status.type}">
+                    <span class="label">✓ ${status.label}</span>
+                    <span class="value">${status.value}</span>
+                </li>
+            `).join('');
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            const resultDiv = document.getElementById('testResult');
+
+            if (!email || !password) {
+                resultDiv.textContent = '❌ Please enter email and password';
+                resultDiv.className = 'test-result show';
+                return;
+            }
+
+            if (typeof firebaseService === 'undefined') {
+                resultDiv.textContent = '❌ firebaseService not available. Check console for errors.';
+                resultDiv.className = 'test-result show';
+                return;
+            }
+
+            resultDiv.textContent = '⏳ Testing login...';
+            resultDiv.className = 'test-result show';
+
+            try {
+                const result = await firebaseService.login(email, password);
+                if (result.success) {
+                    resultDiv.textContent = `✅ Login successful! User: ${result.user.uid}`;
+                } else {
+                    resultDiv.textContent = `❌ Login failed: ${result.error}`;
+                }
+            } catch (error) {
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Run checks on load
+        console.log('🚀 Initializing debug console...');
+        setTimeout(() => {
+            checkStatus();
+        }, 1000);
+    </script>
+
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
+    
+    <script>
+        setTimeout(() => {
+            console.log('Debug console ready');
+            checkStatus();
+        }, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard - Healify</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 2rem;
+            color: #333;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            padding: 0.8rem 1.5rem;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #999;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .appointments-list {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+
+        .appointment-item {
+            padding: 1rem;
+            border-left: 4px solid #667eea;
+            margin-bottom: 1rem;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .appointment-item.completed {
+            border-left-color: #27ae60;
+        }
+
+        .appointment-item.cancelled {
+            border-left-color: #e74c3c;
+        }
+
+        .appointment-item.pending {
+            border-left-color: #f39c12;
+        }
+
+        .appointment-item h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+
+        .appointment-item p {
+            margin: 0.2rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .appointment-actions {
+            margin-top: 0.8rem;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .appointment-actions button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-confirm {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #229954;
+        }
+
+        .btn-join {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-join:hover {
+            background: #2980b9;
+        }
+
+        .btn-complete {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-complete:hover {
+            background: #229954;
+        }
+
+        .btn-decline {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-decline:hover {
+            background: #c0392b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .medication-item {
+            background: #f9f9f9;
+            padding: 0.8rem;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .add-medication-btn {
+            padding: 0.5rem 1rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .add-medication-btn:hover {
+            background: #5568d3;
+        }
+
+        .form-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        .form-btn:hover {
+            background: #5568d3;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .tab-navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1>Welcome, Doctor!</h1>
+            <div class="user-info">
+                <div>
+                    <p id="doctorName" style="margin: 0; color: #666;"></p>
+                    <p id="doctorSpecialization" style="margin: 0; color: #999; font-size: 0.9rem;"></p>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Pending Appointments</h3>
+                <div class="number" id="pendingCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Confirmed Appointments</h3>
+                <div class="number" id="confirmedCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Completed Today</h3>
+                <div class="number" id="completedCount">0</div>
+            </div>
+        </div>
+
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('appointments')">All Appointments</button>
+            <button class="tab-btn" onclick="switchTab('pending')">Pending Approval</button>
+            <button class="tab-btn" onclick="switchTab('confirmed')">Confirmed</button>
+        </div>
+
+        <!-- All Appointments Tab -->
+        <div id="appointmentsTab" class="tab-content active">
+            <h2>Your Appointments</h2>
+            <div id="appointmentsList" class="appointments-list">
+                <p style="text-align: center; color: #999;">Loading appointments...</p>
+            </div>
+        </div>
+
+        <!-- Pending Appointments Tab -->
+        <div id="pendingTab" class="tab-content">
+            <h2>Pending Approval</h2>
+            <div id="pendingList" class="appointments-list">
+                <p style="text-align: center; color: #999;">No pending appointments.</p>
+            </div>
+        </div>
+
+        <!-- Confirmed Appointments Tab -->
+        <div id="confirmedTab" class="tab-content">
+            <h2>Confirmed Appointments</h2>
+            <div id="confirmedList" class="appointments-list">
+                <p style="text-align: center; color: #999;">No confirmed appointments.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prescription Modal -->
+    <div id="prescriptionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Prescription</h2>
+                <button class="modal-close" onclick="closePrescriptionModal()">&times;</button>
+            </div>
+            <form id="prescriptionForm">
+                <div id="patientInfo"></div>
+
+                <div class="form-group">
+                    <label>Medications</label>
+                    <div id="medicationsList"></div>
+                    <button type="button" class="add-medication-btn" onclick="addMedicationField()">+ Add Medication</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="prescriptionNotes">Notes</label>
+                    <textarea id="prescriptionNotes" placeholder="Any additional notes for the patient..."></textarea>
+                </div>
+
+                <button type="submit" class="form-btn">Save Prescription</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Consultation Modal -->
+    <div id="consultationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Patient Details</h2>
+                <button class="modal-close" onclick="closeConsultationModal()">&times;</button>
+            </div>
+            <div id="patientDetails"></div>
+            <button class="form-btn" onclick="startConsultation()">Start Video Consultation</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="firebase-service.js"></script>
+
+    <script>
+        let currentDoctorId = null;
+        let currentAppointmentId = null;
+        let currentPatientId = null;
+        let appointments = [];
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            const doctorId = localStorage.getItem('doctorId');
+            if (!doctorId) {
+                window.location.href = 'doctor-login.html';
+                return;
+            }
+
+            currentDoctorId = doctorId;
+
+            // Get user data
+            const userData = await firebaseService.getCurrentUserData();
+            if (userData && userData.userType !== 'doctor') {
+                window.location.href = 'doctor-login.html';
+                return;
+            }
+
+            if (userData) {
+                document.getElementById('doctorName').textContent = userData.name || 'Doctor';
+                document.getElementById('doctorSpecialization').textContent = userData.specialization || 'Specialist';
+            }
+
+            // Load appointments
+            await loadAppointments();
+        });
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active from all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        async function loadAppointments() {
+            const result = await firebaseService.getDoctorAppointments(currentDoctorId);
+            if (result.success) {
+                appointments = result.appointments;
+                updateStatistics();
+                displayAppointments();
+            }
+        }
+
+        function updateStatistics() {
+            const pending = appointments.filter(a => a.status === 'pending').length;
+            const confirmed = appointments.filter(a => a.status === 'confirmed').length;
+            const completed = appointments.filter(a => a.status === 'completed').length;
+
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('confirmedCount').textContent = confirmed;
+            document.getElementById('completedCount').textContent = completed;
+        }
+
+        function displayAppointments() {
+            displayAppointmentList('appointmentsList', appointments);
+            displayAppointmentList('pendingList', appointments.filter(a => a.status === 'pending'));
+            displayAppointmentList('confirmedList', appointments.filter(a => a.status === 'confirmed'));
+        }
+
+        function displayAppointmentList(elementId, aptList) {
+            const element = document.getElementById(elementId);
+
+            if (aptList.length === 0) {
+                element.innerHTML = '<p style="text-align: center; color: #999;">No appointments.</p>';
+                return;
+            }
+
+            element.innerHTML = aptList.map(apt => {
+                const date = apt.appointmentDate.toDate ? apt.appointmentDate.toDate() : new Date(apt.appointmentDate);
+                const dateStr = date.toLocaleDateString();
+                const timeStr = apt.appointmentTime;
+
+                let actions = '';
+                if (apt.status === 'pending') {
+                    actions = `
+                        <button class="btn-confirm" onclick="confirmAppointment('${apt.id}')">Confirm</button>
+                        <button class="btn-decline" onclick="declineAppointment('${apt.id}')">Decline</button>
+                    `;
+                } else if (apt.status === 'confirmed') {
+                    actions = `
+                        <button class="btn-join" onclick="openConsultation('${apt.id}', '${apt.patientId}')">Start Consultation</button>
+                    `;
+                } else if (apt.status === 'ongoing') {
+                    actions = `
+                        <button class="btn-complete" onclick="completePrescription('${apt.id}', '${apt.patientId}')">Add Prescription & Complete</button>
+                    `;
+                }
+
+                return `
+                    <div class="appointment-item ${apt.status}">
+                        <h4>Appointment on ${dateStr} at ${timeStr}</h4>
+                        <p><strong>Status:</strong> ${apt.status.charAt(0).toUpperCase() + apt.status.slice(1)}</p>
+                        <p><strong>Reason:</strong> ${apt.reason}</p>
+                        ${apt.notes ? `<p><strong>Patient Notes:</strong> ${apt.notes}</p>` : ''}
+                        <div class="appointment-actions">
+                            ${actions}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function confirmAppointment(appointmentId) {
+            const result = await firebaseService.updateAppointmentStatus(appointmentId, 'confirmed');
+            if (result.success) {
+                showMessage('Appointment confirmed!', 'success');
+                await loadAppointments();
+            } else {
+                showMessage(result.error, 'error');
+            }
+        }
+
+        async function declineAppointment(appointmentId) {
+            if (confirm('Are you sure you want to decline this appointment?')) {
+                const result = await firebaseService.updateAppointmentStatus(appointmentId, 'cancelled');
+                if (result.success) {
+                    showMessage('Appointment declined.', 'success');
+                    await loadAppointments();
+                } else {
+                    showMessage(result.error, 'error');
+                }
+            }
+        }
+
+        function openConsultation(appointmentId, patientId) {
+            currentAppointmentId = appointmentId;
+            currentPatientId = patientId;
+            document.getElementById('consultationModal').classList.add('show');
+        }
+
+        function closeConsultationModal() {
+            document.getElementById('consultationModal').classList.remove('show');
+        }
+
+        function startConsultation() {
+            window.location.href = `video-consultation.html?appointmentId=${currentAppointmentId}&doctorId=${currentDoctorId}`;
+        }
+
+        function completePrescription(appointmentId, patientId) {
+            currentAppointmentId = appointmentId;
+            currentPatientId = patientId;
+            document.getElementById('prescriptionModal').classList.add('show');
+        }
+
+        function closePrescriptionModal() {
+            document.getElementById('prescriptionModal').classList.remove('show');
+        }
+
+        function addMedicationField() {
+            const medicationsList = document.getElementById('medicationsList');
+            const index = medicationsList.children.length;
+            const field = document.createElement('div');
+            field.className = 'medication-item';
+            field.innerHTML = `
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <input type="text" placeholder="Medication name" class="med-name" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <input type="text" placeholder="Dosage (e.g., 500mg)" class="med-dosage" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <input type="text" placeholder="Frequency (e.g., 2x daily)" class="med-frequency" required>
+                </div>
+                <button type="button" class="btn-decline" style="width: 100%; padding: 0.4rem;" onclick="this.parentElement.remove()">Remove</button>
+            `;
+            medicationsList.appendChild(field);
+        }
+
+        document.getElementById('prescriptionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await savePrescription();
+        });
+
+        async function savePrescription() {
+            const medications = [];
+            document.querySelectorAll('.medication-item').forEach(item => {
+                medications.push({
+                    name: item.querySelector('.med-name').value,
+                    dosage: item.querySelector('.med-dosage').value,
+                    frequency: item.querySelector('.med-frequency').value,
+                    duration: '7 days'
+                });
+            });
+
+            const notes = document.getElementById('prescriptionNotes').value;
+
+            const result = await firebaseService.addPrescription({
+                patientId: currentPatientId,
+                doctorId: currentDoctorId,
+                consultationId: currentAppointmentId,
+                medications,
+                notes
+            });
+
+            if (result.success) {
+                // Complete the appointment
+                await firebaseService.updateAppointmentStatus(currentAppointmentId, 'completed');
+                showMessage('Prescription saved and appointment completed!', 'success');
+                closePrescriptionModal();
+                document.getElementById('prescriptionForm').reset();
+                document.getElementById('medicationsList').innerHTML = '';
+                await loadAppointments();
+            } else {
+                showMessage(result.error, 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message show ${type}`;
+            setTimeout(() => messageDiv.classList.remove('show'), 4000);
+        }
+
+        function logout() {
+            firebaseService.logout().then(() => {
+                localStorage.removeItem('doctorId');
+                localStorage.removeItem('doctorEmail');
+                window.location.href = 'doctor-login.html';
+            });
+        }
+    </script>
+</body>
+</html>
